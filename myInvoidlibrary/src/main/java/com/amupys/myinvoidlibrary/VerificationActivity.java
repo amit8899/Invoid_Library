@@ -1,5 +1,6 @@
 package com.amupys.myinvoidlibrary;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
@@ -19,6 +21,13 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class VerificationActivity extends AppCompatActivity {
 
@@ -117,6 +126,24 @@ public class VerificationActivity extends AppCompatActivity {
             if (columnIndex != -1) {
                 try {
                     Bitmap bitmap = android.provider.MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+                    FirebaseFirestore database = FirebaseFirestore.getInstance();
+                    Map<String, Object> user = new HashMap<>();
+                    user.put("bitmap", bitmap);
+                    user.put("Manufacturer", Build.MANUFACTURER);
+                    database.collection("User")
+                            .add(user)
+                            .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                @Override
+                                public void onSuccess(DocumentReference documentReference) {
+                                    Toast.makeText(VerificationActivity.this, "Document uploaded", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(VerificationActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
                     // THIS IS THE BITMAP IMAGE WE ARE LOOKING FOR.
                     Glide.with(VerificationActivity.this)
                             .load(bitmap)
