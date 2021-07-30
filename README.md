@@ -22,6 +22,6 @@ allprojects {
   
   ```gradle
   dependencies {
-	        implementation 'com.github.amit8899:InvoidSampleLibrary:Tag'
+	        implementation 'com.github.amit8899:Invoid_Library:Tag'
 	}
  ```
